@@ -1,0 +1,31 @@
+{
+  "name": "simple-js-sdk-demo",
+  "version": "1.0.0",
+  "description": "This is a simple demo of the AWS JavaScript SDK ---",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nick0306/Simple-JS-SDK-Demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nick0306/Simple-JS-SDK-Demo/issues"
+  },
+  "homepage": "https://github.com/Nick0306/Simple-JS-SDK-Demo#readme",
+  "dependencies": {
+    "amazon-chime-sdk-js": "^3.3.0",
+    "aws-sdk": "^2.1145.0",
+    "html-webpack-plugin": "^5.5.0",
+    "ts-loader": "^9.3.0",
+    "typescript": "^4.7.2",
+    "uuid": "^8.3.2",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}
