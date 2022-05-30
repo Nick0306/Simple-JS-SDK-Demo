@@ -1,5 +1,20 @@
+body {
+	background-color: rgb(96, 153, 200);
+}
 h1 {
-  font-family: Tahoma;
-  font-size: x-large;
-  text-align: center;
+	font-family: Tahoma;
+	font-size: xx-large;
+	text-align: center;
+}
+h2 {
+	font-family: Tahoma;
+	font-size: x-large;
+	text-align: center;
+}
+form {
+	font-family: Tahoma;
+	text-align: center;
+}
+form[div] {
+	overflow: hidden;
 }
