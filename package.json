@@ -2,7 +2,7 @@
 	"name": "simple-js-sdk-demo",
 	"version": "1.0.0",
 	"description": "This is a simple demo of the AWS JavaScript SDK ---",
-	"main": "index.js",
+	"main": "index.ts",
 	"scripts": {
 		"build": "webpack",
 		"start": "npm run build && webpack serve --open"

@@ -44,19 +44,21 @@ const handleJoinRequest = async (meetingName, attendeeName, res) => {
 				ExternalUserId: attendeeName,
 			})
 			.promise();
+		console.log('Create Attendee Success');
 		respond(res, 200, { meeting, attendee });
-	} catch (error) {}
-
-	const respong = (res, statusCode, data) => {
-		res.statusCode = statusCode;
-		res.setHeader('Content-Type', 'application/json');
-		res.setHeader('Access-Control-Allow-Origin', '*');
-		res.end(JSON.stringify(data));
-	};
+	} catch (error) {
+		console.log('Error creating meeting or attendee', error);
+	}
+};
+const respond = (res, statusCode, data) => {
+	res.statusCode = statusCode;
+	res.setHeader('Content-Type', 'application/json');
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.end(JSON.stringify(data));
 };
 
 server.listen(port, hostName, (e) => {
-	if(e){
-		console.log("Error: " + e);
-	}else console.log(`Server running at http://${hostName}:${port}/`);
+	if (e) {
+		console.log('Error: ' + e);
+	} else console.log(`Server running at http://${hostName}:${port}/`);
 });
