@@ -6,10 +6,13 @@ import {
 	LogLevel,
 	MeetingSession,
 	MeetingSessionConfiguration,
+	VideoTile,
+	VideoTileState,
 } from 'amazon-chime-sdk-js';
 
 class Demo {
 	private roster: { [key: string]: any } = {};
+	private device: any;
 	constructor() {
 		const joinMeetingForm = document.getElementById('form-authenticate');
 		joinMeetingForm.addEventListener('submit', async (e) => {
@@ -107,35 +110,56 @@ class Demo {
 
 		});
 
+
+		let myTileId : number;
+		const observer = {
+			videoTileDidUpdate: (tileState: VideoTileState) => {
+		  		if (!tileState.boundAttendeeId || tileState.localTile || tileState.isContent) {
+					return;
+		  		}
+				myTileId = tileState.tileId;
+				meetingSession.audioVideo.bindVideoElement(tileState.tileId, videoElement);
+ 				console.log('BOUNDED')
+			},
+			videoTileWasRemoved: (tileId : number) => {
+				if (myTileId === tileId) {
+				  console.log(`You called removeLocalVideoTile. videoElement can be bound to another tile.`);
+				  myTileId = null;
+				}
+			}
+		};
+
+
+
+		const videoElement = document.getElementsByTagName('video')[0];
+		let isOn = false;
+		let first = true;
+		meetingSession.audioVideo.addObserver(observer);
+		document.getElementById('video-pause').addEventListener('click', async ()=>{
+			if(!isOn){
+				//await meetingSession.audioVideo.startVideoInput(this.device.deviceId);
+				meetingSession.audioVideo.startLocalVideoTile();
+				isOn = true;
+			}else{
+				meetingSession.audioVideo.stopLocalVideoTile();
+				isOn = false;
+			}
+		});
+
 		
 		meetingSession.audioVideo.bindAudioElement(audioElement);
 		meetingSession.audioVideo.realtimeSubscribeToAttendeeIdPresence(callback);
 	}
 
+
 	private async listAndStartDevices(meetingSession: MeetingSession): Promise<void> {
 		const audioInputDevices = await meetingSession.audioVideo.listAudioInputDevices();
 		const audioOutputDevices = await meetingSession.audioVideo.listAudioOutputDevices();
-		//const videoInputDevices = await meetingSession.audioVideo.listVideoInputDevices();
+		const videoInputDevices = await meetingSession.audioVideo.listVideoInputDevices();
 		await meetingSession.audioVideo.startAudioInput(audioInputDevices[0].deviceId);
 		await meetingSession.audioVideo.chooseAudioOutput(audioOutputDevices[0].deviceId);
-		/*await meetingSession.audioVideo.startVideoInput(videoInputDevices[0].deviceId);
-		const videoElement = document.getElementsByTagName('video')[0];
-		
-		const observer = {
-			// videoTileDidUpdate is called whenever a new tile is created or tileState changes.
-			videoTileDidUpdate: (tileState: { boundAttendeeId: any; localTile: any; tileId: number; }) => {
-			  // Ignore a tile without attendee ID and other attendee's tile.
-			  if (!tileState.boundAttendeeId || !tileState.localTile) {
-				return;
-			  }
-			  
-			  meetingSession.audioVideo.bindVideoElement(tileState.tileId, videoElement);
-			  console.log('BOUND')
-			}
-		  };
-	
-		meetingSession.audioVideo.addObserver(observer);
-		meetingSession.audioVideo.startLocalVideoTile();*/
+		this.device = videoInputDevices[0];
+		await meetingSession.audioVideo.startVideoInput(this.device.deviceId);
 	}
 }
 
