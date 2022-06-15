@@ -13,6 +13,7 @@ import {
 class Demo {
 	private roster: { [key: string]: any } = {};
 	private device: any;
+	private attendeeId: string;
 	constructor() {
 		const joinMeetingForm = document.getElementById('form-authenticate');
 		joinMeetingForm.addEventListener('submit', async (e) => {
@@ -53,6 +54,11 @@ class Demo {
 			}else if(!(this.roster[attendeeId].muted)){
 				status.push("UNMUTED")
 			}
+			if(this.roster[attendeeId].hasStartedLocalVideoTile){
+				status.push("CAMERA ON");
+			}else if(!(this.roster[attendeeId].hasStartedLocalVideoTile)){
+				status.push("CAMERA OFF");
+			}
 			document.getElementById('roster-state').innerText += "\n" + status.toString();
 		}
 		
@@ -73,6 +79,7 @@ class Demo {
 			logger,
 			deviceController
 		);
+
 		await this.listAndStartDevices(meetingSession);
 		this.setupSubscriptions(meetingSession);
 		meetingSession.audioVideo.start();
@@ -80,9 +87,9 @@ class Demo {
 
 	private setupSubscriptions(meetingSession: MeetingSession): void {
 		const callback = (attendeeId: string, present: boolean, _exteralUserId: string, dropped: boolean) => {
+			this.attendeeId = attendeeId;
 			if(present){
 				this.roster[attendeeId] = {
-					...this.roster[attendeeId],
 					... { name: _exteralUserId.split('#').slice(-1)[0] }
 				};
 			}
@@ -95,6 +102,7 @@ class Demo {
 				if (muted !== null) {
 					this.roster[attendeeId].muted = muted;
 					this.updateRoster();
+					console.log(JSON.stringify(this.roster));
 				}
 			});
 		};
@@ -140,18 +148,20 @@ class Demo {
 				//await meetingSession.audioVideo.startVideoInput(this.device.deviceId);
 				meetingSession.audioVideo.startLocalVideoTile();
 				isOn = true;
+				this.roster[this.attendeeId].hasStartedLocalVideoTile = isOn;
+				this.updateRoster();
 			}else{
 				meetingSession.audioVideo.stopLocalVideoTile();
 				isOn = false;
+				this.roster[this.attendeeId].hasStartedLocalVideoTile = isOn;
+				this.updateRoster();
 			}
 		});
 
-		
 		meetingSession.audioVideo.bindAudioElement(audioElement);
 		meetingSession.audioVideo.realtimeSubscribeToAttendeeIdPresence(callback);
 	}
-
-
+	
 	private async listAndStartDevices(meetingSession: MeetingSession): Promise<void> {
 		const audioInputDevices = await meetingSession.audioVideo.listAudioInputDevices();
 		const audioOutputDevices = await meetingSession.audioVideo.listAudioOutputDevices();
